@@ -1,0 +1,6 @@
+# Ignore target directory (Rust build artifacts)
+target/
+
+# Optionally ignore other unnecessary files/folders
+.idea/
+.vscode/

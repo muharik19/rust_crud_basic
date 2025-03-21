@@ -1,0 +1,14 @@
+# If you prefer the allow list template instead of the deny list, see community template:
+# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
+#
+# Dependencies
+/target
+Cargo.lock
+
+# IDE files
+.vscode
+.DS_Store
+.idea
+
+# Config & Env.
+.env

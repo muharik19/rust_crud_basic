@@ -1,0 +1,39 @@
+version: '3.5'
+services:
+  rust-app-postgres:
+    container_name: rust-app-postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret@123
+      - POSTGRES_DB=rustdb
+    volumes:
+      - rust-app-postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - rust-app-net
+
+  rust-app:
+    container_name: rust-app
+    build: .
+    ports:
+      - "9009:9009"
+    env_file:
+      - .env
+    depends_on:
+      - rust-app-postgres
+    environment:
+      - DATABASE_URL=postgres://root:secret@123@host.docker.internal:5432/rustdb?sslmode=disable
+    networks:
+      - rust-app-net
+    volumes:
+      - .:/app
+
+volumes:
+  rust-app-postgres:
+    external: false
+
+networks:
+  rust-app-net:
+    name: rust-app-net
