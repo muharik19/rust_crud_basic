@@ -30,16 +30,43 @@ Despite, it is possible to run this project in local machine Please follow this 
 # Project-Structure
 
     rust_crud_basic/
-    ├── README.md         # Project description
-    ├── LICENSE           # Project license
-    ├── Cargo.toml        # Dependency list
-    ├── src/              # Application logic
-    │   ├── config.rs     # Configuration
-    │   ├── handlers.rs   # Handling requests
-    │   ├── main.rs       # Main applications running
-    │   ├── models.rs     # Domain models
-    │   ├── repository.rs # Repository for data access
-    │   ├── routes.rs     # Routes for RESTful API
+    ├── src/
+    │   ├── main.rs          # Entry point
+    │   ├── lib.rs           # Optional (for shared logic)
+    │   ├── api/             # API route handlers
+    │   │   ├── mod.rs       # Module declarations
+    │   │   ├── users.rs     # User-related endpoints
+    │   │   ├── auth.rs      # Authentication endpoints
+    │   ├── db/              # Database abstraction
+    │   │   ├── mod.rs       # Module declarations
+    │   │   ├── models.rs    # Data models
+    │   │   ├── schema.rs    # ORM schema (if using Diesel)
+    │   │   ├── repository.rs # Database operations
+    │   ├── services/        # Business logic
+    │   │   ├── mod.rs       # Module declarations
+    │   │   ├── user_service.rs # User-related business logic
+    │   ├── config/          # Configuration management
+    │   │   ├── mod.rs       # Module declarations
+    │   │   ├── settings.rs  # Load config from env or files
+    │   ├── middlewares/     # Middleware components
+    │   │   ├── mod.rs       # Module declarations
+    │   │   ├── auth_mw.rs   # Authentication middleware
+    │   ├── utils/           # Utility functions/helpers
+    │   │   ├── mod.rs       # Module declarations
+    │   │   ├── hash.rs      # Password hashing utilities
+    │   ├── errors.rs        # Error handling
+    │   ├── routes.rs        # API route definitions
+    │   ├── app.rs           # Application setup (router, middleware)
+    ├── tests/               # Integration tests
+    │   ├── users_test.rs    # API tests for users
+    │   ├── auth_test.rs     # API tests for authentication
+    ├── migrations/          # Database migrations (Diesel)
+    ├── .env                 # Environment variables (optional)
+    ├── Cargo.toml           # Dependencies and package metadata
+    ├── Cargo.lock           # Dependency lock file (generated)
+    ├── README.md            # Project documentation
+    ├── LICENSE              # Project license
+    └── target/              # Build output (generated)
 
 ## Documentation API Postman
 

@@ -1,12 +1,11 @@
-// src/main.rs
 mod config;
 mod handlers;
 mod models;
 mod repository;
 mod routes;
 
-use actix_web::{App, HttpServer};
-use config::CONFIG;
+use actix_web::{App, HttpServer, web};
+use config::settings::CONFIG;
 use sqlx::postgres::PgPoolOptions; // our config singleton
 
 #[actix_web::main]
@@ -40,7 +39,7 @@ async fn main() -> std::io::Result<()> {
     println!("Database connection pooling successfully");
 
     // Wrap pool in actix_web::Data so it can be shared among handlers.
-    let pool_data = actix_web::web::Data::new(pool);
+    let pool_data = web::Data::new(pool);
 
     println!("Serving Rest Http on 0.0.0.0: 9009");
 

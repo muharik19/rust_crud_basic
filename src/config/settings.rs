@@ -1,4 +1,3 @@
-// src/config.rs
 use once_cell::sync::Lazy;
 use std::env;
 
