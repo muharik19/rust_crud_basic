@@ -3,6 +3,7 @@ mod handlers;
 mod models;
 mod repository;
 mod routes;
+mod utils;
 
 use actix_web::{App, HttpServer, web, middleware::DefaultHeaders, http::header};
 use config::settings::CONFIG;
