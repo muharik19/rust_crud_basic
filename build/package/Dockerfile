@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy the current directory contents into the container at /app
 COPY . /app
-COPY .env .env
+COPY .env ./.env
 
 # Install dependencies and build the project in release mode
 RUN cargo build --release

@@ -1,5 +1,5 @@
 use crate::models::{CreateItem, Item, UpdateItem};
-use crate::utils::pagination::PaginationRequest;
+use crate::internal::pkg::utils::pagination::PaginationRequest;
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 

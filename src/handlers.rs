@@ -1,7 +1,7 @@
 // src/handlers.rs
 use crate::models::{CreateItem, UpdateItem, Response, Items, ItemsQuery};
 use crate::repository::{self, DeleteItemError}; // Ensure repository is imported
-use crate::utils::pagination::PaginationRequest;
+use crate::internal::pkg::utils::pagination::PaginationRequest;
 use actix_web::{HttpRequest, HttpResponse, Responder, web};
 use sqlx::{Error, postgres::PgPool};
 use serde_json::json;

@@ -3,11 +3,11 @@ mod handlers;
 mod models;
 mod repository;
 mod routes;
-mod utils;
+mod internal;
 
 use actix_web::{App, HttpServer, web, middleware::DefaultHeaders, http::header};
+use crate::internal::pkg::database::sql::postgres::create_pool;
 use config::settings::CONFIG;
-use sqlx::postgres::PgPoolOptions; // our config singleton
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -15,34 +15,15 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init();
 
-    let database_url = CONFIG.database_url.clone();
-
     // Initialize Postgres connection pool
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&database_url)
-        .await
-        .expect("Unable to connect to database");
-
-    // Create table if it does not exist.
-    // In a full project you’d likely use migrations.
-    sqlx::query(
-        "CREATE TABLE IF NOT EXISTS items (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            description TEXT
-        )",
-    )
-    .execute(&pool)
-    .await
-    .expect("Failed to create table");
-
-    println!("Database connection pooling successfully");
+    let pool = create_pool().await;
 
     // Wrap pool in actix_web::Data so it can be shared among handlers.
     let pool_data = web::Data::new(pool);
 
-    println!("Serving Rest Http on 0.0.0.0: 9009");
+    let port: u16 = CONFIG.port.parse().expect("Invalid port");
+    
+    println!("Serving Rest Http on 0.0.0.0: {}", port);
 
     // Start HTTP server on port 9009.
     HttpServer::new(move || {
@@ -61,7 +42,7 @@ async fn main() -> std::io::Result<()> {
         )
             .configure(routes::init_routes)
     })
-    .bind(("0.0.0.0", 9009))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }
