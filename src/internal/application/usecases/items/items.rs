@@ -2,6 +2,7 @@ use crate::internal::domain::entities::items::items::{CreateItem, UpdateItem, It
 use crate::internal::domain::entities::response::Response;
 use crate::internal::application::repositories::items::items::{self, DeleteItemError};
 use crate::internal::pkg::utils::pagination::PaginationRequest;
+use crate::internal::constant::status::{SUCCESS, FAILED_INTERNAL, FAILED_NOT_FOUND, FAILED_EXIST};
 use actix_web::{HttpRequest, HttpResponse, Responder, web};
 use sqlx::{Error, postgres::PgPool};
 use serde_json::json;
@@ -16,7 +17,7 @@ pub async fn create_item(
         return HttpResponse::BadRequest()
         .json(
             Response::<serde_json::Value> {
-                response_code: "05".to_string(),
+                response_code: FAILED_EXIST.to_string(),
                 response_desc: "Name already exist".to_string(),
                 response_data: None,
             }
@@ -27,7 +28,7 @@ pub async fn create_item(
         Ok(new_item) => HttpResponse::Ok()
         .json(
             Response {
-                response_code: "00".to_string(),
+                response_code: SUCCESS.to_string(),
                 response_desc: "OK".to_string(),
                 response_data: Some(json!(new_item)),
             }
@@ -35,7 +36,7 @@ pub async fn create_item(
         Err(err) => HttpResponse::InternalServerError()
         .json(
             Response::<serde_json::Value> {
-                response_code: "01".to_string(),
+                response_code: FAILED_INTERNAL.to_string(),
                 response_desc: err.to_string(),
                 response_data: None,
             }
@@ -68,6 +69,17 @@ pub async fn get_items(
     // }
     match items::get_items(pool.get_ref(), pagination, filter_map).await {
         Ok((items, count)) => {
+            if count == 0 {
+                return HttpResponse::NotFound()
+                .json(
+                    Response::<serde_json::Value> {
+                        response_code: FAILED_NOT_FOUND.to_string(),
+                        response_desc: "Not Found".to_string(),
+                        response_data: None,
+                    }
+                );
+            }
+
             let total_page = if count % limit == 0 { count / limit } else { count / limit + 1 };
             let paginated: Items = Items {
                 page,
@@ -79,7 +91,7 @@ pub async fn get_items(
             HttpResponse::Ok()
             .json(
                 Response {
-                    response_code: "00".to_string(),
+                    response_code: SUCCESS.to_string(),
                     response_desc: "OK".to_string(),
                     response_data: Some(json!(paginated)),
                 }
@@ -88,7 +100,7 @@ pub async fn get_items(
         Err(err) => HttpResponse::InternalServerError()
         .json(
             Response::<serde_json::Value> {
-                response_code: "01".to_string(),
+                response_code: FAILED_INTERNAL.to_string(),
                 response_desc: err.to_string(),
                 response_data: None,
             }
@@ -104,7 +116,7 @@ pub async fn get_item(
         Ok(item) => HttpResponse::Ok()
         .json(
             Response {
-                response_code: "00".to_string(),
+                response_code: SUCCESS.to_string(),
                 response_desc: "OK".to_string(),
                 response_data: Some(json!(item)),
             }
@@ -113,7 +125,7 @@ pub async fn get_item(
             Error::RowNotFound => HttpResponse::NotFound()
             .json(
                 Response::<serde_json::Value> {
-                    response_code: "02".to_string(),
+                    response_code: FAILED_NOT_FOUND.to_string(),
                     response_desc: "Not Found".to_string(),
                     response_data: None,
                 }
@@ -121,7 +133,7 @@ pub async fn get_item(
             _ => HttpResponse::InternalServerError()
             .json(
                 Response::<serde_json::Value> {
-                    response_code: "01".to_string(),
+                    response_code: FAILED_INTERNAL.to_string(),
                     response_desc: err.to_string(),
                     response_data: None,
                 }
@@ -142,7 +154,7 @@ pub async fn update_item(
                 return HttpResponse::BadRequest()
                 .json(
                     Response::<serde_json::Value> {
-                        response_code: "05".to_string(),
+                        response_code: FAILED_EXIST.to_string(),
                         response_desc: "Name already exist".to_string(),
                         response_data: None,
                     }
@@ -155,7 +167,7 @@ pub async fn update_item(
         Ok(item) => HttpResponse::Ok()
         .json(
             Response {
-                response_code: "00".to_string(),
+                response_code: SUCCESS.to_string(),
                 response_desc: "OK".to_string(),
                 response_data: Some(json!(item)),
             }
@@ -164,7 +176,7 @@ pub async fn update_item(
             Error::RowNotFound => HttpResponse::NotFound()
             .json(
                 Response::<serde_json::Value> {
-                    response_code: "02".to_string(),
+                    response_code: FAILED_NOT_FOUND.to_string(),
                     response_desc: "Not Found".to_string(),
                     response_data: None,
                 }
@@ -172,7 +184,7 @@ pub async fn update_item(
             _ => HttpResponse::InternalServerError()
             .json(
                 Response::<serde_json::Value> {
-                    response_code: "01".to_string(),
+                    response_code: FAILED_INTERNAL.to_string(),
                     response_desc: err.to_string(),
                     response_data: None,
                 }
@@ -189,7 +201,7 @@ pub async fn delete_item(
         Ok(_) => HttpResponse::Ok()
         .json(
             Response::<serde_json::Value> {
-                response_code: "00".to_string(),
+                response_code: SUCCESS.to_string(),
                 response_desc: "OK".to_string(),
                 response_data: None,
             }
@@ -198,7 +210,7 @@ pub async fn delete_item(
             DeleteItemError::NotFound => HttpResponse::NotFound()
             .json(
                 Response::<serde_json::Value> {
-                    response_code: "02".to_string(),
+                    response_code: FAILED_NOT_FOUND.to_string(),
                     response_desc: "Not Found".to_string(),
                     response_data: None,
                 }
@@ -206,7 +218,7 @@ pub async fn delete_item(
             _ => HttpResponse::InternalServerError()
             .json(
                 Response::<serde_json::Value> {
-                    response_code: "01".to_string(),
+                    response_code: FAILED_INTERNAL.to_string(),
                     response_desc: "Internal Server Error".to_string(),
                     response_data: None,
                 }
