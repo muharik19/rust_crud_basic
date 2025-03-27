@@ -12,6 +12,17 @@ pub async fn create_item(
     pool: web::Data<PgPool>,
     item: web::Json<CreateItem>,
 ) -> impl Responder {
+    if let Ok(_) = items::get_item_name(pool.get_ref(), item.name.as_str()).await {
+        return HttpResponse::BadRequest()
+        .json(
+            Response::<serde_json::Value> {
+                response_code: "05".to_string(),
+                response_desc: "Name already exist".to_string(),
+                response_data: None,
+            }
+        );
+    }
+
     match items::create_item(&pool, item.into_inner()).await {
         Ok(new_item) => HttpResponse::Ok()
         .json(
@@ -124,7 +135,23 @@ pub async fn update_item(
     item_id: web::Path<i32>,
     update: web::Json<UpdateItem>,
 ) -> impl Responder {
-    match items::update_item(pool.get_ref(), item_id.into_inner(), update.into_inner()).await {
+    let id = item_id.into_inner();
+    if let Some(name) = update.name.as_deref() {
+        if let Ok(item) = items::get_item_name(pool.get_ref(), name).await {
+            if item.id != id {
+                return HttpResponse::BadRequest()
+                .json(
+                    Response::<serde_json::Value> {
+                        response_code: "05".to_string(),
+                        response_desc: "Name already exist".to_string(),
+                        response_data: None,
+                    }
+                );
+            }
+        }
+    }
+
+    match items::update_item(pool.get_ref(), id, update.into_inner()).await {
         Ok(item) => HttpResponse::Ok()
         .json(
             Response {

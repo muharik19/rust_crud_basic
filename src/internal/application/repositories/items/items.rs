@@ -84,6 +84,15 @@ pub async fn get_item(pool: &PgPool, item_id: i32) -> Result<Item, sqlx::Error> 
     Ok(item)
 }
 
+// Retrieve a single item by name
+pub async fn get_item_name(pool: &PgPool, item_name: &str) -> Result<Item, sqlx::Error> {
+    let item = sqlx::query_as::<_, Item>("SELECT id, name, description FROM items WHERE name = $1")
+        .bind(item_name)
+        .fetch_one(pool)
+        .await?;
+    Ok(item)
+}
+
 // Update an item by id (partial update)
 pub async fn update_item(
     pool: &PgPool,

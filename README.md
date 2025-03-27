@@ -109,4 +109,5 @@ Despite, it is possible to run this project in local machine Please follow this 
 [API](https://documenter.getpostman.com/view/4324137/2sAYkGLega)
 
 ## References
-[Rustfinity](https://www.rustfinity.com/blog/create-high-performance-rest-api-with-rust)
+- [Rustfinity](https://www.rustfinity.com/blog/create-high-performance-rest-api-with-rust)
+- [Documentation Rust](https://doc.rust-lang.org/rust-by-example/flow_control/if_else.html)
