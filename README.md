@@ -42,7 +42,7 @@ Despite, it is possible to run this project in local machine Please follow this 
     │   │   │   |   └── routes.rs       # API route definitions
     │   │   │   ├── mod.rs              # Module declarations
     │   │   │   └── server.rs           # Server setup for REST API
-    │   │   ├── mod.rs                  # Module declarations
+    │   │   └── mod.rs                  # Module declarations
     │   ├── mod.rs                      # Module declarations
     │   ├── config/                     # Configuration management
     │   │   ├── mod.rs                  # Module declarations
@@ -64,25 +64,29 @@ Despite, it is possible to run this project in local machine Please follow this 
     │   │   │   |   |   ├── items.rs    # Items use cases
     │   │   │   |   |   └── mod.rs      # Module declarations
     │   │   │   |   └── mod.rs          # Module declarations
-    │   ├── domain/                     # Domain models
-    │   │   ├── entities/               # Domain entities
-    │   │   |   ├── response.rs         # Response standardization entities
-    │   │   |   ├── mod.rs              # Module declarations
-    │   │   |   ├── items/              # Items related entities group
-    │   │   |   |   ├── items.rs        # Items entity definition
-    │   │   |   |   └── mod.rs          # Module declarations
-    │   │   ├── mod.rs                  # Module declarations
-    │   │   ├── pkg/                    # Internal packages
-    │   │   |   ├── database/           # Database related code
-    │   │   |   |   ├── sql/            # SQL database connection code
-    │   │   |   |   |   ├── mod.rs      # Module declarations
-    │   │   |   |   |   ├── postgres.rs # Initial Connection database
-    │   │   |   |   └── mod.rs          # Module declarations
-    │   │   |   ├── utils/              # Utility functions
+    │   |   |   ├── constant/           # Constant internal
     │   │   |   |   ├── mod.rs          # Module declarations
-    │   │   |   |   └── pagination.rs   # function declarations
-    │   │   |   └── mod.rs              # Module declarations
-    │   │   └── mod.rs                  # Module declarations
+    │   │   |   |   └── status.rs       # Constant declarations
+    │   |   |   ├── domain/             # Domain models
+    │   │   |   |   ├── entities/       # Domain entities
+    │   │   |   |   |   ├── items/      # Items related entities group
+    |   |   |   |   |   |   ├──items.rs # Items entity definition
+    |   |   |   |   |   |   └── mod.rs  # Module declarations
+    │   │   |   |   |   ├── mod.rs      # Response standardization entities
+    │   │   |   |   |   ├── response.rs # Response standardization entities
+    │   │   |   |   └── mod.rs          # Module declarations
+    │   │   |   ├── pkg/                    # Internal packages
+    │   │   |   |   ├── database/           # Database related code
+    │   │   |   |   |   ├── sql/            # SQL database connection code
+    │   │   |   |   |   |   ├── mod.rs      # Module declarations
+    │   │   |   |   |   |   ├── postgres.rs # Initial Connection database
+    │   │   |   |   |   ├── mod.rs            # SQL database connection code
+    │   │   |   |   ├── utils/              # Utility functions
+    │   │   |   |   |   ├── mod.rs          # Module declarations
+    │   │   |   |   |   └── pagination.rs   # function declarations
+    │   │   |   |   |   └── mod.rs          # Module declarations
+    │   │   |   |   └── mod.rs              # Module declarations
+    │   │   |   └── mod.rs                  # Module declarations
     │   ├── middlewares/                # Middleware components
     │   │   ├── mod.rs                  # Module declarations
     │   │   └── auth_mw.rs              # Authentication middleware
