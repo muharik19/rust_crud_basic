@@ -68,9 +68,9 @@ Despite, it is possible to run this project in local machine Please follow this 
     │   │   ├── entities/               # Domain entities
     │   │   |   ├── response.rs         # Response standardization entities
     │   │   |   ├── mod.rs              # Module declarations
-    │   │   |   └── items/              # Items related entities group
-    │   │   |       ├── items.rs        # Items entity definition
-    │   │   |       └── mod.rs          # Module declarations
+    │   │   |   ├── items/              # Items related entities group
+    │   │   |   |   ├── items.rs        # Items entity definition
+    │   │   |   |   └── mod.rs          # Module declarations
     │   │   ├── mod.rs                  # Module declarations
     │   │   ├── pkg/                    # Internal packages
     │   │   |   ├── database/           # Database related code
