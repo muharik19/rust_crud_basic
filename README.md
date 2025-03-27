@@ -31,65 +31,76 @@ Despite, it is possible to run this project in local machine Please follow this 
 
     rust_crud_basic/
     ├── src/
-    │   ├── main.rs             # Entry point
-    │   ├── lib.rs              # Optional (for shared logic)
-    │   ├── api/                # API route handlers
-    │   │   ├── mod.rs          # Module declarations
-    │   │   ├── users.rs        # User-related endpoints
-    │   │   ├── auth.rs         # Authentication endpoints
-    │   ├── db/                 # Database abstraction
-    │   │   ├── mod.rs          # Module declarations
-    │   │   ├── models.rs       # Data models
-    │   │   ├── schema.rs       # ORM schema (if using Diesel)
-    │   │   ├── repository.rs   # Database operations
-    │   ├── services/           # Business logic
-    │   │   ├── mod.rs          # Module declarations
-    │   │   ├── user_service.rs # User-related business logic
-    │   ├── config/             # Configuration management
-    │   │   ├── mod.rs          # Module declarations
-    │   │   ├── settings.rs     # Load config from env or files
-    │   ├── internal/           # Code that can only be used by this project
-    │   │   ├── application/    # Application logic
-    │   │   |   ├── controllers/  # Controllers for handling requests
-    │   │   |   ├── repositories/ # Repositories for data access
-    │   │   |   ├── usecases/     # Use cases for application logic
-    │   │   ├── pkg/            # Internal packages
-    │   │   |   ├── database/   # Controllers for handling requests
-    │   │   |   |   ├── sql/    # SQL database connection code
-    │   │   |   |   |   ├── mod.rs # Module declarations
+    │   ├── main.rs                 # Entry point
+    ├── api/                        # API definitions
+    │   ├── rest/                   # REST API definitions
+    │   │   ├── api/                # REST API implementation
+    │   │   │   ├── routes/         # Routes for REST API
+    │   │   │   |   ├── mod.rs      # Module declarations
+    │   │   │   |   └── routes.rs   # API route definitions
+    │   │   │   ├── mod.rs          # Module declarations
+    │   │   │   └── server.rs       # Server setup for REST API
+    │   │   ├── mod.rs              # Module declarations
+    │   ├── mod.rs                  # Module declarations
+    │   ├── config/                 # Configuration management
+    │   │   ├── mod.rs              # Module declarations
+    │   │   ├── settings.rs         # Load config from env or files
+    │   ├── internal/               # Code that can only be used by this project
+    │   │   ├── application/        # Application logic
+    │   │   |   ├── controllers/    # Controllers for handling requests
+    │   │   │   |   ├── items/      # Items related controllers
+    │   │   │   |   |   ├── items.rs # Items controller
+    │   │   │   |   |   └── mod.rs  # Module declarations
+    │   │   │   |   └── mod.rs      # Module declarations
+    │   │   |   ├── repositories/   # Repositories for data access
+    │   │   │   |   ├── items/      # Items related controllers
+    │   │   │   |   |   ├── items.rs # Items controller
+    │   │   │   |   |   └── mod.rs  # Module declarations
+    │   │   │   |   └── mod.rs      # Module declarations
+    │   │   |   ├── usecases/       # Use cases for application logic
+    │   │   │   |   ├── items/      # Items related controllers
+    │   │   │   |   |   ├── items.rs # Items controller
+    │   │   │   |   |   └── mod.rs  # Module declarations
+    │   │   │   |   └── mod.rs      # Module declarations
+    │   ├── domain/                 # Domain models
+    │   │   ├── entities/           # Domain entities
+    │   │   |   ├── response.rs     # Response standardization entities
+    │   │   |   ├── mod.rs          # Module declarations
+    │   │   |   └── items/          # Items related entities group
+    │   │   |       ├── items.rs    # Items entity definition
+    │   │   |       └── mod.rs      # Module declarations
+    │   │   ├── mod.rs              # Module declarations
+    │   │   ├── pkg/                # Internal packages
+    │   │   |   ├── database/       # Controllers for handling requests
+    │   │   |   |   ├── sql/        # SQL database connection code
+    │   │   |   |   |   ├── mod.rs  # Module declarations
     │   │   |   |   |   ├── postgres.rs # Initial Connection database
-    │   │   |   |   ├── mod.rs  # Module declarations
-    │   │   |   ├── utils/      # Controllers for handling requests
-    │   │   |   |   ├── mod.rs  # Module declarations
+    │   │   |   |   ├── mod.rs      # Module declarations
+    │   │   |   ├── utils/          # Controllers for handling requests
+    │   │   |   |   ├── mod.rs      # Module declarations
     │   │   |   |   ├── pagination.rs # Module declarations
-    │   │   |   ├── mod.rs      # Module declarations
-    │   │   ├── mod.rs          # Module declarations
-    │   ├── middlewares/        # Middleware components
-    │   │   ├── mod.rs          # Module declarations
-    │   │   ├── auth_mw.rs      # Authentication middleware
-    │   ├── utils/              # Utility functions/helpers
-    │   │   ├── mod.rs          # Module declarations
-    │   │   ├── hash.rs         # Password hashing utilities
-    │   ├── errors.rs           # Error handling
-    │   ├── routes.rs           # API route definitions
-    │   ├── app.rs              # Application setup (router, middleware)
-    ├── tests/                  # Integration tests
-    │   ├── users_test.rs       # API tests for users
-    │   ├── auth_test.rs        # API tests for authentication
-    ├── build/                  # Build-related files
-    │   ├── package/            # Package-related files
-    │   │   └── Dockerfile      # Dockerfile for building the application
-    ├── deployments/            # Deployment-related files
-    │   ├── docker-compose.yml  # Docker Compose configuration file
-    ├── migrations/             # Database migration scripts
+    │   │   |   ├── mod.rs          # Module declarations
+    │   │   └── mod.rs              # Module declarations
+    │   ├── middlewares/            # Middleware components
+    │   │   ├── mod.rs              # Module declarations
+    │   │   └── auth_mw.rs          # Authentication middleware
+    ├── tests/                      # Integration tests
+    │   ├── users_test.rs           # API tests for users
+    │   ├── auth_test.rs            # API tests for authentication
+    ├── build/                      # Build-related files
+    │   ├── package/                # Package-related files
+    │   │   └── Dockerfile          # Dockerfile for building the application
+    ├── deployments/                # Deployment-related files
+    │   ├── docker-compose.yml      # Docker Compose configuration file
+    ├── migrations/                 # Database migration scripts
     │   ├── 20250326071808_create_users_table.sql # Initial migration script for users
     │   ├── 20250326085525_create_items_table.sql # Initial migration script for items
-    ├── .env                    # Environment variables (optional)
-    ├── Cargo.toml              # Dependencies and package metadata
-    ├── Cargo.lock              # Dependency lock file (generated)
-    ├── README.md               # Project documentation
-    ├── LICENSE                 # Project license
-    └── target/                 # Build output (generated)
+    ├── .env                        # Environment variables (optional)
+    ├── Cargo.toml                  # Dependencies and package metadata
+    ├── Cargo.lock                  # Dependency lock file (generated)
+    ├── README.md                   # Project documentation
+    ├── LICENSE                     # Project license
+    └── target/                     # Build output (generated)
 
 ## Documentation API Postman
 

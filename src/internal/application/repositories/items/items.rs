@@ -1,4 +1,4 @@
-use crate::models::{CreateItem, Item, UpdateItem};
+use crate::internal::domain::entities::items::items::{CreateItem, Item, UpdateItem};
 use crate::internal::pkg::utils::pagination::PaginationRequest;
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
