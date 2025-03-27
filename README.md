@@ -5,6 +5,7 @@
 - Install [rust](https://doc.rust-lang.org/book/ch01-01-installation.html) in local machine for convenience development experience (auto complete, code sugestion, etc)
 - Install [rust plugin](https://www.rust-lang.org/tools) to your editor choice (ie. VSCode, Vim/Neovim, Emacs, Eclipse)
 - [Docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/)
+- Install rust hot reloading `cargo install cargo-watch`
 
 ## Continuous Integration support with Github Actions
 - Rust: Triggers the following on every push or pull request, using the latest stable toolchain:
@@ -24,7 +25,8 @@
 Despite, it is possible to run this project in local machine Please follow this steps:
 - Changes file .env to your config `.cp .env.example to .env`.
 - Run apps to root project `cargo run`.
-- Run apps to root project `cargo build`.
+- Build apps to root project `cargo build`.
+- Run apps to root project hot reloading `cargo watch -x 'run'`.
 - Run apps to change directory deployments use docker `docker compose up -d`.
 
 # Project-Structure
