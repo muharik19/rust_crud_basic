@@ -72,7 +72,7 @@ Despite, it is possible to run this project in local machine Please follow this 
     │   │   |   |   |   ├── items/          # Items related entities group
     |   |   |   |   |   |   ├──items.rs     # Items entity definition
     |   |   |   |   |   |   └── mod.rs      # Module declarations
-    │   │   |   |   |   ├── mod.rs          # Response standardization entities
+    │   │   |   |   |   ├── mod.rs          # Module declarations
     │   │   |   |   |   ├── response.rs     # Response standardization entities
     │   │   |   |   └── mod.rs              # Module declarations
     │   │   |   ├── pkg/                    # Internal packages
@@ -80,7 +80,7 @@ Despite, it is possible to run this project in local machine Please follow this 
     │   │   |   |   |   ├── sql/            # SQL database connection code
     │   │   |   |   |   |   ├── mod.rs      # Module declarations
     │   │   |   |   |   |   ├── postgres.rs # Initial Connection database
-    │   │   |   |   |   ├── mod.rs          # SQL database connection code
+    │   │   |   |   |   ├── mod.rs          # Module declarations
     │   │   |   |   ├── utils/              # Utility functions
     │   │   |   |   |   ├── mod.rs          # Module declarations
     │   │   |   |   |   └── pagination.rs   # function declarations
