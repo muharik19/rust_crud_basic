@@ -15,7 +15,7 @@ pub async fn create_user(
     pool: web::Data<PgPool>,
     req: web::Json<CreateUser>,
 ) -> impl Responder {
-    if let Ok(_) = users::get_user_name(pool.get_ref(), req.username.as_str()).await {
+    if let Ok(_) = users::get_user_username(pool.get_ref(), req.username.as_str()).await {
         return HttpResponse::BadRequest()
         .json(
             Response::<serde_json::Value> {
@@ -185,7 +185,7 @@ pub async fn update_user(
 ) -> impl Responder {
     let id = id.into_inner();
     if let Some(username) = update.username.as_deref() {
-        if let Ok(user) = users::get_user_name(pool.get_ref(), username).await {
+        if let Ok(user) = users::get_user_username(pool.get_ref(), username).await {
             if user.id != id {
                 return HttpResponse::BadRequest()
                 .json(

@@ -83,7 +83,7 @@ pub async fn get_user(pool: &PgPool, id: i32) -> Result<User, sqlx::Error> {
     Ok(user)
 }
 
-pub async fn get_user_name(pool: &PgPool, username: &str) -> Result<User, sqlx::Error> {
+pub async fn get_user_username(pool: &PgPool, username: &str) -> Result<User, sqlx::Error> {
     let user = sqlx::query_as::<_, User>("SELECT id, username, email, password FROM users WHERE username = $1")
         .bind(username)
         .fetch_one(pool)
@@ -93,6 +93,15 @@ pub async fn get_user_name(pool: &PgPool, username: &str) -> Result<User, sqlx::
 
 pub async fn get_user_email(pool: &PgPool, email: &str) -> Result<User, sqlx::Error> {
     let user = sqlx::query_as::<_, User>("SELECT id, username, email, password FROM users WHERE email = $1")
+        .bind(email)
+        .fetch_one(pool)
+        .await?;
+    Ok(user)
+}
+
+pub async fn get_user_or(pool: &PgPool, username: &str, email: &str) -> Result<User, sqlx::Error> {
+    let user = sqlx::query_as::<_, User>("SELECT id, username, email, password FROM users WHERE username = $1 OR email = $2")
+        .bind(username)
         .bind(email)
         .fetch_one(pool)
         .await?;
