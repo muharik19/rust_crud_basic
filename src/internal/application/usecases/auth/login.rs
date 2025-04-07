@@ -32,7 +32,7 @@ pub async fn login(
         let data = Token {
             token
         };
-        
+
         Ok(HttpResponse::Ok()
         .json(
             Response {
