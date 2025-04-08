@@ -1,4 +1,4 @@
-use crate::internal::domain::entities::users::users::{CreateUserRequest, CreateUserResponse, UpdateUserRequest, UpdateUserResponse, User};
+use crate::internal::domain::entities::users::users::{CreateUserRequest, CreateUserResponse, UpdateUserRequest, UpdateUserResponse, DetailUserResponse, User};
 use crate::internal::pkg::utils::pagination::PaginationRequest;
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
@@ -31,7 +31,7 @@ pub async fn get_users(
     pool: &PgPool,
     pagination: PaginationRequest,
     filter: HashMap<String, String>
-) -> Result<(Vec<User>, i64), sqlx::Error> {
+) -> Result<(Vec<DetailUserResponse>, i64), sqlx::Error> {
     let valid_sort = match pagination.field.as_str() {
         "id" | "username" | "email" => pagination.field.clone(),
         _ => "id".to_string(),
@@ -59,14 +59,14 @@ pub async fn get_users(
     };
     
     let query = format!(
-        "SELECT id, username, email, password FROM users {} ORDER BY {} {} LIMIT {} OFFSET {}",
+        "SELECT id, username, email FROM users {} ORDER BY {} {} LIMIT {} OFFSET {}",
         where_clause, valid_sort, valid_order, limit, offset
     );
-    let users = sqlx::query_as::<_, User>(&query)
+    let users = sqlx::query_as::<_, DetailUserResponse>(&query)
         .fetch_all(pool)
         .await?;
     let count_query = format!(
-        "SELECT COUNT(*) FROM users {}",
+        "SELECT COUNT(id) FROM users {}",
         where_clause
     );
     let count: i64 = sqlx::query_scalar(&count_query)
@@ -75,7 +75,15 @@ pub async fn get_users(
     Ok((users, count))
 }
 
-pub async fn get_user(pool: &PgPool, id: i32) -> Result<User, sqlx::Error> {
+pub async fn get_user_detail(pool: &PgPool, id: i32) -> Result<DetailUserResponse, sqlx::Error> {
+    let user = sqlx::query_as::<_, DetailUserResponse>("SELECT id, username, email FROM users WHERE id = $1")
+        .bind(id)
+        .fetch_one(pool)
+        .await?;
+    Ok(user)
+}
+
+async fn get_user(pool: &PgPool, id: i32) -> Result<User, sqlx::Error> {
     let user = sqlx::query_as::<_, User>("SELECT id, username, email, password FROM users WHERE id = $1")
         .bind(id)
         .fetch_one(pool)
@@ -83,16 +91,16 @@ pub async fn get_user(pool: &PgPool, id: i32) -> Result<User, sqlx::Error> {
     Ok(user)
 }
 
-pub async fn get_user_username(pool: &PgPool, username: &str) -> Result<User, sqlx::Error> {
-    let user = sqlx::query_as::<_, User>("SELECT id, username, email, password FROM users WHERE username = $1")
+pub async fn get_user_username(pool: &PgPool, username: &str) -> Result<DetailUserResponse, sqlx::Error> {
+    let user = sqlx::query_as::<_, DetailUserResponse>("SELECT id, username, email FROM users WHERE username = $1")
         .bind(username)
         .fetch_one(pool)
         .await?;
     Ok(user)
 }
 
-pub async fn get_user_email(pool: &PgPool, email: &str) -> Result<User, sqlx::Error> {
-    let user = sqlx::query_as::<_, User>("SELECT id, username, email, password FROM users WHERE email = $1")
+pub async fn get_user_email(pool: &PgPool, email: &str) -> Result<DetailUserResponse, sqlx::Error> {
+    let user = sqlx::query_as::<_, DetailUserResponse>("SELECT id, username, email FROM users WHERE email = $1")
         .bind(email)
         .fetch_one(pool)
         .await?;

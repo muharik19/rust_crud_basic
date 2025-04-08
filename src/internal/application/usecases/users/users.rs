@@ -1,4 +1,4 @@
-use crate::internal::domain::entities::users::users::{CreateUserRequest, UpdateUserRequest, Users, UsersQuery};
+use crate::internal::domain::entities::users::users::{CreateUserRequest, UpdateUserRequest, ListUser, UsersQuery};
 use crate::internal::domain::entities::response::Response;
 use crate::internal::application::repositories::users::users::{self, DeleteItemError};
 use crate::internal::pkg::utils::pagination::PaginationRequest;
@@ -142,7 +142,7 @@ pub async fn get_users(
             }
 
             let total_page = if count % limit == 0 { count / limit } else { count / limit + 1 };
-            let paginated: Users = Users {
+            let paginated: ListUser = ListUser {
                 page,
                 limit,
                 total: count,
@@ -173,17 +173,13 @@ pub async fn get_user(
     pool: web::Data<PgPool>,
     id: web::Path<i32>
 ) -> impl Responder {
-    match users::get_user(pool.get_ref(), id.into_inner()).await {
+    match users::get_user_detail(pool.get_ref(), id.into_inner()).await {
         Ok(user) => HttpResponse::Ok()
         .json(
             Response {
                 response_code: SUCCESS.to_string(),
                 response_desc: "OK".to_string(),
-                response_data: Some(json!({
-                    "id": user.id,
-                    "username": user.username,
-                    "email": user.email
-                })),
+                response_data: Some(json!(user)),
             }
         ),
         Err(err) => match err {

@@ -1,6 +1,14 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
+pub struct User {
+    pub id: i32,
+    pub username: String,
+    pub email: String,
+    pub password: String,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct UsersQuery {
     pub page: Option<i64>,
@@ -10,22 +18,21 @@ pub struct UsersQuery {
     pub filter: Option<HashMap<String, String>>
 }
 
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
+pub struct DetailUserResponse {
+    pub id: i32,
+    pub username: String,
+    pub email: String,
+}
+
 #[derive(Serialize, Deserialize)]
-pub struct Users {
+pub struct ListUser {
     pub page: i64,
     pub limit: i64,
     pub total: i64,
     #[serde(rename = "totalPage")]
     pub total_page: i64,
-    pub users: Vec<User>
-}
-
-#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
-pub struct User {
-    pub id: i32,
-    pub username: String,
-    pub email: String,
-    pub password: String,
+    pub users: Vec<DetailUserResponse>
 }
 
 #[derive(Debug, Deserialize)]
