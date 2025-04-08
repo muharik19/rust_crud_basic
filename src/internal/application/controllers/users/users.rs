@@ -1,11 +1,11 @@
-use crate::internal::domain::entities::users::users::{CreateUser, UpdateUser, UsersQuery};
+use crate::internal::domain::entities::users::users::{CreateUserRequest, UpdateUserRequest, UsersQuery};
 use crate::internal::application::usecases::users::users::{create_user, get_users, get_user, update_user, delete_user};
 use actix_web::{HttpRequest, Responder, web};
 use sqlx::postgres::PgPool;
 
 pub async fn create_user_controller(
     pool: web::Data<PgPool>,
-    req: web::Json<CreateUser>,
+    req: web::Json<CreateUserRequest>,
 ) -> impl Responder {
     create_user(pool, req).await
 }
@@ -25,7 +25,7 @@ pub async fn get_user_controller(pool: web::Data<PgPool>, id: web::Path<i32>) ->
 pub async fn update_user_controller(
     pool: web::Data<PgPool>,
     id: web::Path<i32>,
-    update: web::Json<UpdateUser>,
+    update: web::Json<UpdateUserRequest>,
 ) -> impl Responder {
     update_user(pool, id, update).await
 }

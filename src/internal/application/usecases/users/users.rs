@@ -1,4 +1,4 @@
-use crate::internal::domain::entities::users::users::{CreateUser, UpdateUser, Users, UsersQuery};
+use crate::internal::domain::entities::users::users::{CreateUserRequest, UpdateUserRequest, Users, UsersQuery};
 use crate::internal::domain::entities::response::Response;
 use crate::internal::application::repositories::users::users::{self, DeleteItemError};
 use crate::internal::pkg::utils::pagination::PaginationRequest;
@@ -13,7 +13,7 @@ use bcrypt::{hash, DEFAULT_COST};
 
 pub async fn create_user(
     pool: web::Data<PgPool>,
-    req: web::Json<CreateUser>,
+    req: web::Json<CreateUserRequest>,
 ) -> impl Responder {
     if let Ok(_) = users::get_user_username(pool.get_ref(), req.username.as_str()).await {
         return HttpResponse::BadRequest()
@@ -58,11 +58,7 @@ pub async fn create_user(
             Response {
                 response_code: SUCCESS.to_string(),
                 response_desc: "OK".to_string(),
-                response_data: Some(json!({
-                    "id": new_user.id,
-                    "username": new_user.username,
-                    "email": new_user.email
-                })),
+                response_data: Some(json!(new_user)),
             }
         ),
         Err(err) => HttpResponse::InternalServerError()
@@ -181,10 +177,10 @@ pub async fn get_user(
 pub async fn update_user(
     pool: web::Data<PgPool>,
     id: web::Path<i32>,
-    update: web::Json<UpdateUser>,
+    req: web::Json<UpdateUserRequest>,
 ) -> impl Responder {
     let id = id.into_inner();
-    if let Some(username) = update.username.as_deref() {
+    if let Some(username) = req.username.as_deref() {
         if let Ok(user) = users::get_user_username(pool.get_ref(), username).await {
             if user.id != id {
                 return HttpResponse::BadRequest()
@@ -199,7 +195,7 @@ pub async fn update_user(
         }
     }
 
-    if let Some(email) = update.email.as_deref() {
+    if let Some(email) = req.email.as_deref() {
         if let Ok(user) = users::get_user_email(pool.get_ref(), email).await {
             if user.id != id {
                 return HttpResponse::BadRequest()
@@ -214,7 +210,7 @@ pub async fn update_user(
         }
     }
 
-    let mut new_req = update.into_inner();
+    let mut new_req = req.into_inner();
     if let Some(pwd) = new_req.password.clone() {
         if !pwd.is_empty() {
             let hashed = match task::spawn_blocking(move || hash(pwd, DEFAULT_COST)).await {

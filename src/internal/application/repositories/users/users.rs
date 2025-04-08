@@ -1,4 +1,4 @@
-use crate::internal::domain::entities::users::users::{CreateUser, User, UpdateUser};
+use crate::internal::domain::entities::users::users::{CreateUserRequest, CreateUserResponse, UpdateUserRequest, UpdateUserResponse, User};
 use crate::internal::pkg::utils::pagination::PaginationRequest;
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
@@ -15,9 +15,9 @@ impl From<sqlx::Error> for DeleteItemError {
     }
 }
 
-pub async fn create_user(pool: &PgPool, new_user: CreateUser) -> Result<User, sqlx::Error> {
-    let rec = sqlx::query_as::<_, User>(
-"INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email, password",
+pub async fn create_user(pool: &PgPool, new_user: CreateUserRequest) -> Result<CreateUserResponse, sqlx::Error> {
+    let rec = sqlx::query_as::<_, CreateUserResponse>(
+"INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
     )
     .bind(new_user.username)
     .bind(new_user.email)
@@ -111,16 +111,16 @@ pub async fn get_user_or(pool: &PgPool, username: &str, email: &str) -> Result<U
 pub async fn update_user(
     pool: &PgPool,
     id: i32,
-    update: UpdateUser,
-) -> Result<User, sqlx::Error> {
+    req: UpdateUserRequest,
+) -> Result<UpdateUserResponse, sqlx::Error> {
     // Retrieve current item first.
     let current = get_user(pool, id).await?;
-    let new_username = update.username.unwrap_or(current.username);
-    let new_email = update.email.unwrap_or(current.email);
-    let new_password = update.password.or(current.password);
+    let new_username = req.username.unwrap_or(current.username);
+    let new_email = req.email.unwrap_or(current.email);
+    let new_password = req.password.or(current.password);
 
-    let user = sqlx::query_as::<_, User>(
-"UPDATE users SET username = $1, email = $2, password = $3 WHERE id = $4 RETURNING id, username, email, password"
+    let user = sqlx::query_as::<_, UpdateUserResponse>(
+        "UPDATE users SET username = $1, email = $2, password = $3 WHERE id = $4 RETURNING id, username, email"
     )
     .bind(new_username)
     .bind(new_email)
