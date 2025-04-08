@@ -117,7 +117,10 @@ pub async fn update_user(
     let current = get_user(pool, id).await?;
     let new_username = req.username.unwrap_or(current.username);
     let new_email = req.email.unwrap_or(current.email);
-    let new_password = req.password.or(current.password);
+    let new_password = match req.password {
+        Some(ref p) if !p.trim().is_empty() => p.clone(),
+        _ => current.password,
+    };
 
     let user = sqlx::query_as::<_, UpdateUserResponse>(
         "UPDATE users SET username = $1, email = $2, password = $3 WHERE id = $4 RETURNING id, username, email"

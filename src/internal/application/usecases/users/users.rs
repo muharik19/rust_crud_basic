@@ -2,7 +2,7 @@ use crate::internal::domain::entities::users::users::{CreateUserRequest, UpdateU
 use crate::internal::domain::entities::response::Response;
 use crate::internal::application::repositories::users::users::{self, DeleteItemError};
 use crate::internal::pkg::utils::pagination::PaginationRequest;
-use crate::internal::constant::status::{SUCCESS, FAILED_INTERNAL, FAILED_NOT_FOUND, FAILED_EXIST};
+use crate::internal::constant::status::{SUCCESS, FAILED_INTERNAL, FAILED_NOT_FOUND, FAILED_EXIST, FAILED_REQUIRED};
 use actix_web::{HttpRequest, HttpResponse, Responder, web};
 use sqlx::{Error, postgres::PgPool};
 use serde_json::json;
@@ -15,6 +15,39 @@ pub async fn create_user(
     pool: web::Data<PgPool>,
     req: web::Json<CreateUserRequest>,
 ) -> impl Responder {
+    if req.username.trim().len() <= 0 {
+        return HttpResponse::BadRequest()
+        .json(
+            Response::<serde_json::Value> {
+                response_code: FAILED_REQUIRED.to_string(),
+                response_desc: "Username required".to_string(),
+                response_data: None,
+            }
+        );
+    }
+
+    if req.email.trim().len() <= 0 {
+        return HttpResponse::BadRequest()
+        .json(
+            Response::<serde_json::Value> {
+                response_code: FAILED_REQUIRED.to_string(),
+                response_desc: "Email required".to_string(),
+                response_data: None,
+            }
+        );
+    }
+
+    if req.password.trim().len() <= 0 {
+        return HttpResponse::BadRequest()
+        .json(
+            Response::<serde_json::Value> {
+                response_code: FAILED_REQUIRED.to_string(),
+                response_desc: "Password required".to_string(),
+                response_data: None,
+            }
+        );
+    }
+
     if let Ok(_) = users::get_user_username(pool.get_ref(), req.username.as_str()).await {
         return HttpResponse::BadRequest()
         .json(
@@ -179,6 +212,28 @@ pub async fn update_user(
     id: web::Path<i32>,
     req: web::Json<UpdateUserRequest>,
 ) -> impl Responder {
+    if req.username.as_deref().map_or(true, |s| s.trim().is_empty()) {
+        return HttpResponse::BadRequest()
+        .json(
+            Response::<serde_json::Value> {
+                response_code: FAILED_REQUIRED.to_string(),
+                response_desc: "Username required".to_string(),
+                response_data: None,
+            }
+        );
+    }
+
+    if req.email.as_deref().map_or(true, |s| s.trim().is_empty()) {
+        return HttpResponse::BadRequest()
+        .json(
+            Response::<serde_json::Value> {
+                response_code: FAILED_REQUIRED.to_string(),
+                response_desc: "Email required".to_string(),
+                response_data: None,
+            }
+        );
+    }
+
     let id = id.into_inner();
     if let Some(username) = req.username.as_deref() {
         if let Ok(user) = users::get_user_username(pool.get_ref(), username).await {

@@ -18,7 +18,7 @@ pub async fn login(
 ) -> impl Responder {
     if req.username.trim().len() > 0 || req.password.trim().len() > 0 {
         if let Ok(user) = get_user_or(pool.get_ref(), req.username.as_str(), req.username.as_str()).await {
-            let verified = match task::spawn_blocking(move || verify(req.password.as_str(), user.password.as_deref().unwrap_or(""))).await {
+            let verified = match task::spawn_blocking(move || verify(req.password.as_str(), &user.password)).await {
                 Ok(Ok(true)) => true,
                 _ => false,
             };
