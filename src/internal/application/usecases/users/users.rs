@@ -3,6 +3,7 @@ use crate::internal::domain::entities::response::Response;
 use crate::internal::application::repositories::users::users::{self, DeleteItemError};
 use crate::internal::pkg::utils::pagination::PaginationRequest;
 use crate::internal::constant::status::{SUCCESS, FAILED_INTERNAL, FAILED_NOT_FOUND, FAILED_EXIST, FAILED_REQUIRED};
+use crate::internal::domain::entities::auth::login::Claims;
 use actix_web::{HttpRequest, HttpResponse, Responder, web};
 use sqlx::{Error, postgres::PgPool};
 use serde_json::json;
@@ -14,7 +15,12 @@ use bcrypt::{hash, DEFAULT_COST};
 pub async fn create_user(
     pool: web::Data<PgPool>,
     req: web::Json<CreateUserRequest>,
-) -> impl Responder {
+    claims: Claims,
+) -> HttpResponse {
+    println!("sub: {:?}", claims.sub);
+    println!("name: {:?}", claims.name);
+    println!("exp: {:?}", claims.exp);
+
     if req.username.trim().len() <= 0 {
         return HttpResponse::BadRequest()
         .json(

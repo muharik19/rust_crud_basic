@@ -3,7 +3,7 @@ use crate::internal::domain::entities::response::Response;
 use crate::internal::constant::status::{SUCCESS, FAILED_AUTHORIZED, FAILED_INTERNAL, FAILED_REQUIRED};
 use crate::internal::application::repositories::users::users::get_user_or;
 use crate::config::settings::CONFIG;
-use crate::internal::pkg::utils::jwt_exp::parse_jwt_exp;
+use crate::middlewares::jwt::parse_jwt_exp;
 use actix_web::{HttpResponse, Responder, web, Error};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use sqlx::postgres::PgPool;
@@ -62,11 +62,10 @@ pub async fn login(
                         }
                     ))
                 } else {
-                    let error_message = format!("Invalid JWT_EXP format: {}", jwt_exp);
                     Ok::<HttpResponse, actix_web::Error>(HttpResponse::InternalServerError().json(
                         Response::<serde_json::Value> {
                             response_code: FAILED_INTERNAL.to_string(),
-                            response_desc: error_message,
+                            response_desc: format!("Invalid JWT_EXP format: {}", jwt_exp),
                             response_data: None,
                         }
                     ))

@@ -1,6 +1,7 @@
 mod config;
 mod internal;
 mod api;
+mod middlewares;
 
 use actix_web::web::Data;
 use crate::internal::pkg::database::sql::postgres::create_pool;
