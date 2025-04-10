@@ -2,9 +2,9 @@ use crate::internal::domain::entities::users::users::{CreateUserRequest, UpdateU
 use crate::internal::domain::entities::response::Response;
 use crate::internal::application::repositories::users::users::{self, DeleteItemError};
 use crate::internal::pkg::utils::pagination::PaginationRequest;
-use crate::internal::constant::status::{SUCCESS, FAILED_INTERNAL, FAILED_NOT_FOUND, FAILED_EXIST, FAILED_REQUIRED};
+use crate::internal::constant::status::{FAILED_EXIST, FAILED_INTERNAL, FAILED_NOT_FOUND, FAILED_REQUIRED, SUCCESS, FAILED_AUTHORIZED};
 use crate::internal::domain::entities::auth::login::Claims;
-use actix_web::{HttpRequest, HttpResponse, Responder, web};
+use actix_web::{web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use sqlx::{Error, postgres::PgPool};
 use serde_json::json;
 use std::collections::HashMap;
@@ -14,14 +14,25 @@ use bcrypt::{hash, DEFAULT_COST};
 
 pub async fn create_user(
     pool: web::Data<PgPool>,
-    req: web::Json<CreateUserRequest>,
-    claims: Claims,
-) -> HttpResponse {
-    println!("sub: {:?}", claims.sub);
-    println!("name: {:?}", claims.name);
-    println!("exp: {:?}", claims.exp);
+    http_req: HttpRequest,
+    payload: web::Json<CreateUserRequest>,
+) -> impl Responder {
+    let ext = http_req.extensions();
+    let claims = match ext.get::<Claims>() {
+        Some(c) => c,
+        None => return HttpResponse::Unauthorized()
+        .json(
+            Response::<serde_json::Value> {
+                response_code: FAILED_AUTHORIZED.to_string(),
+                response_desc: "Unauthorized".to_string(),
+                response_data: None,
+            }
+        ),
+    };
 
-    if req.username.trim().len() <= 0 {
+    println!("sub: {:?}", claims.sub);
+
+    if payload.username.trim().len() <= 0 {
         return HttpResponse::BadRequest()
         .json(
             Response::<serde_json::Value> {
@@ -32,7 +43,7 @@ pub async fn create_user(
         );
     }
 
-    if req.email.trim().len() <= 0 {
+    if payload.email.trim().len() <= 0 {
         return HttpResponse::BadRequest()
         .json(
             Response::<serde_json::Value> {
@@ -43,7 +54,7 @@ pub async fn create_user(
         );
     }
 
-    if req.password.trim().len() <= 0 {
+    if payload.password.trim().len() <= 0 {
         return HttpResponse::BadRequest()
         .json(
             Response::<serde_json::Value> {
@@ -54,7 +65,7 @@ pub async fn create_user(
         );
     }
 
-    if let Ok(_) = users::get_user_username(pool.get_ref(), req.username.as_str()).await {
+    if let Ok(_) = users::get_user_username(pool.get_ref(), payload.username.as_str()).await {
         return HttpResponse::BadRequest()
         .json(
             Response::<serde_json::Value> {
@@ -65,7 +76,7 @@ pub async fn create_user(
         );
     }
 
-    if let Ok(_) = users::get_user_email(pool.get_ref(), req.email.as_str()).await {
+    if let Ok(_) = users::get_user_email(pool.get_ref(), payload.email.as_str()).await {
         return HttpResponse::BadRequest()
         .json(
             Response::<serde_json::Value> {
@@ -76,7 +87,7 @@ pub async fn create_user(
         );
     }
 
-    let password = req.password.clone();
+    let password = payload.password.clone();
     let hashed = match task::spawn_blocking(move || hash(password, DEFAULT_COST)).await {
         Ok(Ok(hash)) => hash,
         _ => return HttpResponse::InternalServerError()
@@ -89,7 +100,7 @@ pub async fn create_user(
         ),
     };
 
-    let mut new_req = req.into_inner();
+    let mut new_req = payload.into_inner();
     new_req.password = hashed;
     match users::create_user(&pool, new_req).await {
         Ok(new_user) => HttpResponse::Ok()
@@ -113,7 +124,7 @@ pub async fn create_user(
 
 pub async fn get_users(
     pool: web::Data<PgPool>,
-    req: HttpRequest,
+    http_req: HttpRequest,
     params: web::Query<UsersQuery>
 ) -> impl Responder {
     let page = params.page.unwrap_or(1);
@@ -122,7 +133,7 @@ pub async fn get_users(
     let field = params.field.as_deref().unwrap_or("ASC");
     let pagination = PaginationRequest::new(limit, page, field, sort);
     let mut filter_map = params.filter.clone().unwrap_or_default();
-    let query_str = req.query_string();
+    let query_str = http_req.query_string();
     let query: HashMap<String, String> = form_urlencoded::parse(query_str.as_bytes()).into_owned().collect();
     for (key, value) in query {
         if key.starts_with("filter[") && key.ends_with("]") {
@@ -212,9 +223,9 @@ pub async fn get_user(
 pub async fn update_user(
     pool: web::Data<PgPool>,
     id: web::Path<i32>,
-    req: web::Json<UpdateUserRequest>,
+    payload: web::Json<UpdateUserRequest>,
 ) -> impl Responder {
-    if req.username.as_deref().map_or(true, |s| s.trim().is_empty()) {
+    if payload.username.as_deref().map_or(true, |s| s.trim().is_empty()) {
         return HttpResponse::BadRequest()
         .json(
             Response::<serde_json::Value> {
@@ -225,7 +236,7 @@ pub async fn update_user(
         );
     }
 
-    if req.email.as_deref().map_or(true, |s| s.trim().is_empty()) {
+    if payload.email.as_deref().map_or(true, |s| s.trim().is_empty()) {
         return HttpResponse::BadRequest()
         .json(
             Response::<serde_json::Value> {
@@ -237,7 +248,7 @@ pub async fn update_user(
     }
 
     let id = id.into_inner();
-    if let Some(username) = req.username.as_deref() {
+    if let Some(username) = payload.username.as_deref() {
         if let Ok(user) = users::get_user_username(pool.get_ref(), username).await {
             if user.id != id {
                 return HttpResponse::BadRequest()
@@ -252,7 +263,7 @@ pub async fn update_user(
         }
     }
 
-    if let Some(email) = req.email.as_deref() {
+    if let Some(email) = payload.email.as_deref() {
         if let Ok(user) = users::get_user_email(pool.get_ref(), email).await {
             if user.id != id {
                 return HttpResponse::BadRequest()
@@ -267,7 +278,7 @@ pub async fn update_user(
         }
     }
 
-    let mut new_req = req.into_inner();
+    let mut new_req = payload.into_inner();
     if let Some(pwd) = new_req.password.clone() {
         if !pwd.is_empty() {
             let hashed = match task::spawn_blocking(move || hash(pwd, DEFAULT_COST)).await {
