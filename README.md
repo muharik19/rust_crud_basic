@@ -6,18 +6,6 @@
 - [Docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/)
 - Install rust hot reloading `cargo install cargo-watch`
 
-## Creating the Tables
-> Now that the database is set up, it's time to create migrations to define the tables in our schema. We will create two tables: users and items in separate migration files.
-
-## Create the Users Table Migration
-- Create the users table migration `sqlx migrate add create_users_table`
-- Create the items table migration `sqlx migrate add create_items_table`
-
-## Apply the Migrations
-```sh
-sqlx migrate run
-```
-
 ## Continuous Integration support with Github Actions
 - Rust: Triggers the following on every push or pull request, using the latest stable toolchain:
     - Ensure uniform code formatting `cargo fmt`
@@ -38,6 +26,18 @@ Despite, it is possible to run this project in local machine Please follow this 
 - Build apps to root project `cargo build`.
 - Run apps to root project hot reloading `cargo watch -x 'run'`.
 - Run apps to change directory deployments use docker `docker compose up -d`.
+
+## Creating the Tables
+> Now that the database is set up, it's time to create migrations to define the tables in our schema. We will create two tables: users and items in separate migration files.
+
+## Create the Users Table Migration
+- Create the users table migration `sqlx migrate add create_users_table`
+- Create the items table migration `sqlx migrate add create_items_table`
+
+## Apply the Migrations
+```sh
+sqlx migrate run
+```
 
 # Project-Structure
 
