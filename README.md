@@ -1,11 +1,22 @@
 > Proposed RESTful API based service. This project is still in development stage, any critic and suggestion all very based including but not limited to project name, function naming, folder structure etc. please refer to CONTRIBUTING.md.
 
 ## Prerequisite
-
 - Install [rust](https://doc.rust-lang.org/book/ch01-01-installation.html) in local machine for convenience development experience (auto complete, code sugestion, etc)
 - Install [rust plugin](https://www.rust-lang.org/tools) to your editor choice (ie. VSCode, Vim/Neovim, Emacs, Eclipse)
 - [Docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/)
 - Install rust hot reloading `cargo install cargo-watch`
+
+## Creating the Tables
+> Now that the database is set up, it's time to create migrations to define the tables in our schema. We will create two tables: users and items in separate migration files.
+
+## Create the Users Table Migration
+- Create the users table migration `sqlx migrate add create_users_table`
+- Create the items table migration `sqlx migrate add create_items_table`
+
+## Apply the Migrations
+```sh
+sqlx migrate run
+```
 
 ## Continuous Integration support with Github Actions
 - Rust: Triggers the following on every push or pull request, using the latest stable toolchain:
@@ -21,7 +32,6 @@
     - Upload archives as assets for the appropriate GitHub release
 
 ## How to run
-
 Despite, it is possible to run this project in local machine Please follow this steps:
 - Changes file .env to your config `.cp .env.example to .env`.
 - Run apps to root project `cargo run`.
