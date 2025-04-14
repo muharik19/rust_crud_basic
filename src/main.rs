@@ -3,9 +3,9 @@ mod internal;
 mod api;
 mod middlewares;
 
-use actix_web::web::Data;
 use crate::internal::pkg::database::sql::postgres::create_pool;
 use crate::api::rest::api::server::start_server;
+use actix_web::web::Data;
 use dotenv::dotenv;
 use env_logger::init;
 

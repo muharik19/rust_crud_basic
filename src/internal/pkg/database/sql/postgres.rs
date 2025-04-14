@@ -1,6 +1,8 @@
+use crate::config::settings::CONFIG;
+use crate::middlewares::logger::init_logger;
 use sqlx::{Pool, Postgres};
 use sqlx::postgres::PgPoolOptions;
-use crate::config::settings::CONFIG;
+use slog::info;
 
 pub async fn create_pool() -> Pool<Postgres> {
     let database_url = CONFIG.database_url.clone();
@@ -10,7 +12,8 @@ pub async fn create_pool() -> Pool<Postgres> {
         .await
         .expect("Unable to connect to database");
 
-    println!("Database connection pooling successfully");
+    let (_, logger_terminal) = init_logger();
+    info!(logger_terminal, "Database connection pooling successfully");
 
     pool
 }

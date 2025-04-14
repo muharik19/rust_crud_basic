@@ -11,7 +11,7 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .route("", web::get().to(items::get_items_controller))
             .route("/{id}", web::get().to(items::get_item_controller))
             .route("/{id}", web::put().to(items::update_item_controller))
-            .route("/{id}", web::delete().to(items::delete_item_controller)),
+            .route("/{id}", web::delete().to(items::delete_item_controller))
     );
 
     cfg.service(
@@ -21,7 +21,7 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .route("", web::get().to(users::get_users_controller))
             .route("/{id}", web::get().to(users::get_user_controller))
             .route("/{id}", web::put().to(users::update_user_controller))
-            .route("/{id}", web::delete().to(users::delete_user_controller)),
+            .route("/{id}", web::delete().to(users::delete_user_controller))
     );
 
     cfg.service(

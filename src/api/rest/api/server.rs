@@ -1,15 +1,21 @@
-use actix_web::{App, HttpServer, web, middleware::DefaultHeaders, http::header};
 use crate::config::settings::CONFIG;
 use crate::api::rest::api::routes::routes::init_routes;
+use actix_web::{App, HttpServer, web, middleware::DefaultHeaders, http::header};
+use crate::middlewares::logger::SlogMiddleware;
+use crate::middlewares::logger::init_logger;
+use slog::info;
 
 pub async fn start_server(pool_data: web::Data<sqlx::Pool<sqlx::Postgres>>) -> std::io::Result<()> {
     let port: u16 = CONFIG.port.parse().expect("Invalid port");
 
-    println!("Serving Rest Http on 0.0.0.0:{}", port);
-    
+    let (logger_file, logger_terminal) = init_logger();
+    info!(logger_terminal, "{}", format!("Serving Rest Http on 0.0.0.0: {}", port));
+
     HttpServer::new(move || {
         App::new()
             .app_data(pool_data.clone())
+            .wrap(SlogMiddleware::new(logger_file.clone()))
+            .wrap(SlogMiddleware::new(logger_terminal.clone()))
             .wrap(DefaultHeaders::new()
                 .add((header::ACCESS_CONTROL_ALLOW_CREDENTIALS, "false"))
                 .add((header::ACCESS_CONTROL_ALLOW_HEADERS, "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, Origin, Cookie, Timestamp"))
